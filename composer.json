@@ -1,0 +1,8 @@
+{
+  "name": "omairena/creador-web-php-puro",
+  "description": "Aplicación web PHP puro - login, registro y manejo de registros",
+  "require": {
+    "php": ">=7.0",
+    "phpmailer/phpmailer": "^6.6"
+  }
+}

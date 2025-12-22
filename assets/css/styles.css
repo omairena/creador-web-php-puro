@@ -1,0 +1,55 @@
+/* styles.css - estilo base y responsivo (tablet-friendly) */
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --accent:#2b6cb0;
+  --muted:#6b7280;
+  --sidebar:#1f2937;
+  --sidebar-text:#ffffff;
+}
+
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--bg);color:#111}
+
+a{color:var(--accent);text-decoration:none}
+
+.auth-page .auth-container{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.card{background:var(--card);padding:20px;border-radius:8px;box-shadow:0 4px 14px rgba(15,23,42,0.06);max-width:420px;width:100%}
+.card h1{margin-top:0}
+label{display:block;margin:12px 0;font-size:0.95rem}
+label input{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:6px}
+.btn{display:inline-block;padding:10px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;margin-top:10px}
+.alert{background:#fee2e2;color:#991b1b;padding:10px;border-radius:6px;margin-bottom:10px}
+.success{background:#ecfdf5;color:#065f46;padding:10px;border-radius:6px;margin-bottom:10px}
+
+/* Layout con sidebar */
+.layout{display:flex;min-height:100vh}
+.sidebar{
+  background:var(--sidebar);color:var(--sidebar-text);width:260px;flex-shrink:0;transition:transform .25s ease-in-out;
+  padding:20px 12px;position:fixed;left:0;top:0;bottom:0;overflow:auto;
+}
+.brand h2{margin:0 0 12px 0}
+.menu{display:flex;flex-direction:column}
+.menu a{color:var(--sidebar-text);padding:10px 12px;border-radius:6px;margin:6px 0;display:block}
+.menu a.active{background:rgba(255,255,255,0.08)}
+.main{margin-left:260px;flex:1;padding:20px}
+.header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.toggle-btn{display:none;background:transparent;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer}
+
+/* content cards */
+.content .card{max-width:900px}
+
+/* Responsive: tablets and smaller */
+@media (max-width: 1000px) {
+  .sidebar{transform:translateX(-100%);position:fixed;z-index:1000}
+  .sidebar.open{transform:translateX(0)}
+  .toggle-btn{display:inline-block}
+  .main{margin-left:0}
+}
+
+/* For very small screens fallback */
+@media (max-width: 420px){
+  .card{padding:16px}
+}

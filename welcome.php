@@ -27,7 +27,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
     </div>
     <nav class="menu">
       <a href="welcome.php" class="<?= ($current === 'welcome.php') ? 'active' : '' ?>">Inicio</a>
-      <a href="#">Registros</a>
+      <div class="menu-item <?= in_array($current, ['registro_produccion.php']) ? 'open' : '' ?>">
+        <a href="#" class="menu-parent">Registros</a>
+        <div class="submenu">
+          <a href="registro_produccion.php" class="<?= ($current === 'registro_produccion.php') ? 'active' : '' ?>">Registro Producción</a>
+        </div>
+      </div>
       <a href="users.php" class="<?= ($current === 'users.php') ? 'active' : '' ?>">Usuario</a>
 
       <div class="menu-item <?= in_array($current, ['products.php', 'presentations.php']) ? 'open' : '' ?>">

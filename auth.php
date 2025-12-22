@@ -1,7 +1,9 @@
 <?php
 // auth.php - funciones de autenticación (usa $mysqli de db.php)
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/vendor/autoload.php'; // PHPMailer si está instalado
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php'; // PHPMailer si está instalado
+}
 session_start();
 
 function register_user($name, $email, $password) {
@@ -199,6 +201,89 @@ function reset_password_with_token($token, $new_password) {
     return ['success' => true];
 }
 
+/* ---------------------------
+   Funciones para perfil/usuarios
+   --------------------------- */
+
+/**
+ * Obtener datos públicos del usuario por ID
+ */
+function get_user_by_id($id) {
+    global $mysqli;
+    $stmt = $mysqli->prepare("SELECT id, name, email, created_at FROM users WHERE id = ?");
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $stmt->bind_result($uid, $name, $email, $created_at);
+    if ($stmt->fetch()) {
+        $stmt->close();
+        return [
+            'id' => $uid,
+            'name' => $name,
+            'email' => $email,
+            'created_at' => $created_at
+        ];
+    }
+    $stmt->close();
+    return null;
+}
+
+/**
+ * Cambiar la contraseña del usuario autenticado (requiere la contraseña actual)
+ */
+function change_user_password($user_id, $current_password, $new_password) {
+    global $mysqli;
+    if (strlen($new_password) < 6) {
+        return ['success' => false, 'message' => 'La nueva contraseña debe tener al menos 6 caracteres'];
+    }
+
+    // Obtener hash actual
+    $stmt = $mysqli->prepare("SELECT password FROM users WHERE id = ?");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $stmt->bind_result($password_hash);
+    if (!$stmt->fetch()) {
+        $stmt->close();
+        return ['success' => false, 'message' => 'Usuario no encontrado'];
+    }
+    $stmt->close();
+
+    if (!password_verify($current_password, $password_hash)) {
+        return ['success' => false, 'message' => 'La contraseña actual es incorrecta'];
+    }
+
+    $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
+    $stmt = $mysqli->prepare("UPDATE users SET password = ? WHERE id = ?");
+    $stmt->bind_param('si', $new_hash, $user_id);
+    if (!$stmt->execute()) {
+        $err = $stmt->error;
+        $stmt->close();
+        return ['success' => false, 'message' => 'Error al actualizar contraseña: ' . $err];
+    }
+    $stmt->close();
+
+    return ['success' => true];
+}
+
+/**
+ * Guardar cambios simples del perfil (por ejemplo nombre) - opcional
+ */
+function update_user_name($user_id, $new_name) {
+    global $mysqli;
+    $new_name = trim($new_name);
+    if ($new_name === '') return ['success' => false, 'message' => 'El nombre no puede estar vacío'];
+    $stmt = $mysqli->prepare("UPDATE users SET name = ? WHERE id = ?");
+    $stmt->bind_param('si', $new_name, $user_id);
+    if (!$stmt->execute()) {
+        $err = $stmt->error;
+        $stmt->close();
+        return ['success' => false, 'message' => 'Error al actualizar nombre: ' . $err];
+    }
+    $stmt->close();
+    // actualizar sesión
+    $_SESSION['user_name'] = $new_name;
+    return ['success' => true];
+}
+
 function send_reset_email($email, $name, $token) {
     // Preferir SMTP vía PHPMailer si se configura
     $BASE_URL = rtrim(getenv('APP_BASE_URL') ?: 'http://localhost', '/');
@@ -238,7 +323,7 @@ function send_reset_email($email, $name, $token) {
 
             return $mail->send();
         } catch (Exception $e) {
-            // fallo, seguir a fallback
+            // en fallo, continua al fallback
         }
     }
 

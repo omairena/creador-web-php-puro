@@ -34,19 +34,41 @@ label input{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:6px}
 .menu{display:flex;flex-direction:column}
 .menu a{color:var(--sidebar-text);padding:10px 12px;border-radius:6px;margin:6px 0;display:block}
 .menu a.active{background:rgba(255,255,255,0.08)}
+/* submenu under Producto */
+.menu-item .menu-parent{color:var(--sidebar-text);padding:10px 12px;border-radius:6px;margin:6px 0;display:block;cursor:pointer}
+.menu-item .submenu{display:none;padding-left:12px;margin-left:6px}
+.menu-item.open .submenu{display:block}
+.menu-item .submenu a{padding:8px 12px;margin:4px 0;border-radius:6px;display:block;color:var(--sidebar-text)}
+.menu-item .menu-parent::after{content:'▾';float:right;opacity:0.8}
+.menu-item.open .menu-parent::after{content:'▴'}
 .main{margin-left:260px;flex:1;padding:20px}
 .header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
 .toggle-btn{display:none;background:transparent;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer}
+  .collapse-btn{display:none;background:transparent;border:none;font-size:1.2rem;color:var(--muted);cursor:pointer;margin-right:8px}
 
+  /* Collapsed sidebar (desktop) */
+  .sidebar-collapsed .sidebar{transform:translateX(-100%) !important; pointer-events:none}
+  .sidebar-collapsed .main{margin-left:0}
 /* content cards */
 .content .card{max-width:900px}
+
+/* Table styling */
+.table{width:100%;border-collapse:collapse;margin-top:12px}
+.table th,.table td{border:1px solid #e5e7eb;padding:8px;text-align:left}
+.table thead th{background:#fafafa;color:var(--muted)}
+.table tbody tr:hover{background:#f9fafb}
 
 /* Responsive: tablets and smaller */
 @media (max-width: 1000px) {
   .sidebar{transform:translateX(-100%);position:fixed;z-index:1000}
   .sidebar.open{transform:translateX(0)}
   .toggle-btn{display:inline-block}
+  .collapse-btn{display:none}
   .main{margin-left:0}
+}
+@media (min-width: 1001px) {
+  /* collapse-btn visible on desktop */
+  .collapse-btn{display:inline-block}
 }
 
 /* For very small screens fallback */

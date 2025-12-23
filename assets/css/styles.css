@@ -1,3 +1,75 @@
+/* Login centrado y angosto */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f6f7fa;
+}
+.auth-container {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px #0001;
+  padding: 32px 28px 24px 28px;
+  max-width: 350px;
+  width: 95vw;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.auth-card h1 {
+  margin-top: 18px;
+  margin-bottom: 18px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+.auth-card form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.auth-card label {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.auth-card input[type="email"],
+.auth-card input[type="password"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  margin-top: 2px;
+}
+.auth-card .btn {
+  width: 100%;
+  margin-top: 8px;
+}
+.auth-card .alert {
+  background: #ffeaea;
+  color: #b90000;
+  border-radius: 5px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: center;
+}
+.auth-card .logo-login {
+  display: block;
+  margin: 0 auto 10px auto;
+  max-width: 120px;
+  max-height: 90px;
+}
 .card {
   overflow-x: auto;
 }
@@ -116,7 +188,8 @@ label input{width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:6px}
 .menu-item .submenu a{padding:8px 12px;margin:4px 0;border-radius:6px;display:block;color:var(--sidebar-text)}
 .menu-item .menu-parent::after{content:'▾';float:right;opacity:0.8}
 .menu-item.open .menu-parent::after{content:'▴'}
-.main{margin-left:260px;flex:1;padding:20px}
+.main{margin-left:260px;flex:1;padding:20px;display:flex;flex-direction:column;min-height:100vh;}
+.content {flex:1 1 auto;}
 .header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
 .toggle-btn{display:none;background:transparent;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer}
   .collapse-btn{display:none;background:transparent;border:none;font-size:1.2rem;color:var(--muted);cursor:pointer;margin-right:8px}

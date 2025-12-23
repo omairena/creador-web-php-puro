@@ -1,10 +1,13 @@
 <?php
 // auth.php - funciones de autenticación (usa $mysqli de db.php)
 require_once __DIR__ . '/db.php';
+
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php'; // PHPMailer si está instalado
 }
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function register_user($name, $email, $password) {
     global $mysqli;

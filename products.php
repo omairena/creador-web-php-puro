@@ -105,25 +105,7 @@ $presentations = get_presentations();
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body class="layout">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <h2>Mi App</h2>
-    </div>
-    <nav class="menu">
-      <a href="welcome.php" class="<?= ($current === 'welcome.php') ? 'active' : '' ?>">Inicio</a>
-      <a href="users.php" class="<?= ($current === 'users.php') ? 'active' : '' ?>">Usuario</a>
-
-      <div class="menu-item <?= in_array($current, ['products.php', 'presentations.php']) ? 'open' : '' ?>">
-        <a href="#" class="menu-parent">Producto</a>
-        <div class="submenu">
-          <a href="products.php" class="<?= ($current === 'products.php') ? 'active' : '' ?>">Producto</a>
-          <a href="presentations.php" class="<?= ($current === 'presentations.php') ? 'active' : '' ?>">Presentación</a>
-        </div>
-      </div>
-
-      <a href="?action=logout" onclick="event.preventDefault(); window.location='welcome.php?action=logout'">Cerrar sesión</a>
-    </nav>
-  </aside>
+  <?php include 'sidebar.php'; ?>
 
   <div class="main">
     <header class="header">

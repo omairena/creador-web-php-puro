@@ -25,7 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="auth-page">
   <main class="auth-container">
-    <div class="card">
+    <div class="auth-card">
+      <div style="width:100%;text-align:center;">
+        <?php include 'logo_fragment.php'; ?>
+      </div>
       <h1>Iniciar sesión</h1>
       <?php if ($errors): ?>
         <div class="alert"><?=htmlspecialchars($errors)?></div>
@@ -39,10 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </label>
         <button type="submit" class="btn">Entrar</button>
       </form>
-      <p><a href="password_reset_request.php">¿Olvidaste tu contraseña?</a></p>
-      <p>¿No tienes cuenta? <a href="register.php">Regístrate</a></p>
+      <p style="margin-bottom:6px;"><a href="password_reset_request.php">¿Olvidaste tu contraseña?</a></p>
+      <p style="margin-bottom:0;">¿No tienes cuenta? <a href="register.php">Regístrate</a></p>
     </div>
   </main>
   <script src="assets/js/app.js"></script>
 </body>
+<?php include 'footer.php'; ?>
 </html>

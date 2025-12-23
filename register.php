@@ -61,4 +61,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </main>
   <script src="assets/js/app.js"></script>
 </body>
+<?php include 'footer.php'; ?>
 </html>

@@ -45,4 +45,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </main>
 </body>
+<?php include 'footer.php'; ?>
 </html>

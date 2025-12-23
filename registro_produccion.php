@@ -352,6 +352,115 @@ $current = basename($_SERVER['SCRIPT_NAME']);
 		let productos = [];
 
 		$(document).ready(function(){
+			// --- Modal para justificación y código de eliminación ---
+			let idEliminar = null;
+			let modalHtml = `
+				<div id="modalEliminar" class="modal" style="display:none;z-index:3000;">
+					<div class="modal-content card" style="max-width:420px;">
+						<h3>Eliminar registro de producción</h3>
+						<form id="formJustificacion">
+							<label>Justificación
+								<textarea id="justificacionEliminar" required style="width:100%;min-height:60px;"></textarea>
+							</label>
+							<div id="bloqueCodigo" style="display:none;">
+								<label>Código de confirmación enviado por correo
+									<input type="text" id="codigoEliminar" name="codigoEliminar" maxlength="12" autocomplete="off" style="width:100%;">
+								</label>
+							</div>
+							<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
+								<button type="button" class="btn" id="btnCancelarEliminar">Cancelar</button>
+								<button type="submit" class="btn btn-danger" id="btnConfirmarEliminar">Continuar</button>
+							</div>
+						</form>
+					</div>
+				</div>`;
+			if($('#modalEliminar').length===0) $('body').append(modalHtml);
+			function abrirModalEliminar(id) {
+				idEliminar = id;
+				$('#modalEliminar').show();
+				$('#bloqueCodigo').hide();
+				$('#codigoEliminar').val('').prop('disabled', true);
+				$('#justificacionEliminar').val('');
+				$('#btnConfirmarEliminar').text('Solicitar código');
+			}
+			function cerrarModalEliminar() {
+				$('#modalEliminar').hide();
+				idEliminar = null;
+			}
+			$(document).on('click', '#btnCancelarEliminar', function(){ cerrarModalEliminar(); });
+
+			// Paso 1: Solicitar código con justificación
+			$(document).on('submit', '#formJustificacion', function(e){
+				e.preventDefault();
+				if($('#bloqueCodigo').is(':visible')){
+					// Paso 2: Confirmar código
+					let codigo = $('#codigoEliminar').val().trim();
+					if(!codigo){
+						$('#codigoEliminar').focus();
+						alert('Ingresa el código de confirmación.');
+						return;
+					}
+					$.ajax({
+						url: 'registro_produccion.php?ajax=eliminar',
+						type: 'POST',
+						contentType: 'application/json',
+						data: JSON.stringify({ id: idEliminar, codigo: codigo }),
+						success: function(resp){
+							if(resp.success){
+								alert('Registro eliminado correctamente.');
+								cerrarModalEliminar();
+								cargarRegistros();
+							}else{
+								alert(resp.message||'Error al eliminar');
+							}
+						},
+						error: function(xhr, status, error){
+						alert('Error AJAX al eliminar: '+error);
+						console.error('AJAX eliminar error:', status, error, xhr.responseText);
+						}
+					});
+				}else{
+					// Paso 1: Solicitar código
+					let justificacion = $('#justificacionEliminar').val().trim();
+					if(!justificacion){
+						$('#justificacionEliminar').focus();
+						alert('Debes ingresar una justificación.');
+						return;
+					}
+					$.ajax({
+						url: 'registro_produccion.php?ajax=eliminar',
+						type: 'POST',
+						contentType: 'application/json',
+						data: JSON.stringify({ id: idEliminar, justificacion: justificacion }),
+						success: function(resp){
+							if(resp.success){
+								$('#bloqueCodigo').show();
+								$('#codigoEliminar').prop('disabled', false);
+								$('#btnConfirmarEliminar').text('Eliminar');
+								alert('Se envió un código de confirmación al correo autorizado. Ingrésalo para completar la eliminación.');
+							}else{
+								alert(resp.message||'Error al solicitar código');
+							}
+						},
+						error: function(xhr, status, error){
+						alert('Error AJAX al solicitar código: '+error);
+						console.error('AJAX solicitar código error:', status, error, xhr.responseText);
+						}
+					});
+				}
+			});
+
+			// Cerrar modal al hacer click fuera
+			$(document).on('mousedown', function(e){
+				let m = $('#modalEliminar:visible');
+				if(m.length && !m.find('.modal-content')[0].contains(e.target)) cerrarModalEliminar();
+			});
+
+			// Manejador para botón Eliminar
+			$(document).on('click', '.btnEliminar', function(){
+				let id = $(this).data('id');
+				abrirModalEliminar(id);
+			});
 			// Cargar productos vía AJAX y llenar datalist
 			function cargarProductos() {
 				$.get('registro_produccion.php?ajax=productos', function(data){

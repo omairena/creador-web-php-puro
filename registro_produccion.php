@@ -277,29 +277,7 @@ $current = basename($_SERVER['SCRIPT_NAME']);
 	<!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
 </head>
 <body class="layout">
-	<aside class="sidebar" id="sidebar">
-		<div class="brand">
-			<h2>Mi App</h2>
-		</div>
-		<nav class="menu">
-			<a href="welcome.php" class="<?= ($current === 'welcome.php') ? 'active' : '' ?>">Inicio</a>
-			<div class="menu-item open">
-				<a href="#" class="menu-parent">Registros</a>
-				<div class="submenu">
-					<a href="registro_produccion.php" class="active">Registro Producción</a>
-				</div>
-			</div>
-			<a href="users.php" class="<?= ($current === 'users.php') ? 'active' : '' ?>">Usuario</a>
-			<div class="menu-item">
-				<a href="#" class="menu-parent">Producto</a>
-				<div class="submenu">
-					<a href="products.php">Producto</a>
-					<a href="presentations.php">Presentación</a>
-				</div>
-			</div>
-			<a href="?action=logout">Cerrar sesión</a>
-		</nav>
-	</aside>
+	<?php include 'sidebar.php'; ?>
 
 	<div class="main">
 		<header class="header">
@@ -312,6 +290,10 @@ $current = basename($_SERVER['SCRIPT_NAME']);
 			<div class="card">
 				<button class="btn" id="btnNuevoRegistro">Nuevo registro</button>
 				<h2>Registros creados</h2>
+				<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
+					<input type="text" id="buscadorRegistros" placeholder="Buscar..." style="max-width:220px;padding:6px 10px;border-radius:5px;border:1px solid #ccc;">
+					<div id="paginadorRegistros" style="font-size:0.98rem;"></div>
+				</div>
 				<table class="table">
 					<thead>
 						<tr>
@@ -445,79 +427,92 @@ $current = basename($_SERVER['SCRIPT_NAME']);
 				});
 			});
 
-			// Cargar registros en la tabla
+
+			// --- Paginación y búsqueda en tiempo real ---
+			let registrosData = [];
+			let paginaActual = 1;
+			const registrosPorPagina = 15;
+			let filtroBusqueda = '';
+
+			function renderTablaRegistros() {
+				let filtrados = registrosData.filter(function(r) {
+					if (!filtroBusqueda) return true;
+					let texto = (
+						(r.code||'') + ' ' +
+						(r.name||'') + ' ' +
+						(r.lote||'') + ' ' +
+						(r.responsable||'') + ' ' +
+						(r.observaciones||'')
+					).toLowerCase();
+					return texto.includes(filtroBusqueda.toLowerCase());
+				});
+				let totalPaginas = Math.ceil(filtrados.length / registrosPorPagina) || 1;
+				if (paginaActual > totalPaginas) paginaActual = totalPaginas;
+				let inicio = (paginaActual - 1) * registrosPorPagina;
+				let fin = inicio + registrosPorPagina;
+				let pagina = filtrados.slice(inicio, fin);
+				let html = '';
+				pagina.forEach(function(r){
+					html += '<tr>' +
+						'<td>' + r.code + '</td>' +
+						'<td>' + r.name + '</td>' +
+						'<td>' + r.fecha + '</td>' +
+						'<td>' + r.presentacion + '</td>' +
+						'<td>' + r.cantidad + '</td>' +
+						'<td>' + r.lote + '</td>' +
+						'<td>' + r.vencimiento + '</td>' +
+						'<td>' + r.responsable + '</td>' +
+						'<td>' + (r.observaciones || '') + '</td>' +
+						'<td><button class="btn btn-danger btnEliminar" data-id="' + r.id + '">Eliminar</button></td>' +
+					'</tr>';
+				});
+				$('#tablaRegistros').html(html);
+				// Paginador
+				let pagHtml = '';
+				if (totalPaginas > 1) {
+					pagHtml += '<button class="btn" id="pagAnt" ' + (paginaActual==1?'disabled':'') + '>Anterior</button>';
+					pagHtml += ' Página ' + paginaActual + ' de ' + totalPaginas + ' ';
+					pagHtml += '<button class="btn" id="pagSig" ' + (paginaActual==totalPaginas?'disabled':'') + '>Siguiente</button>';
+				} else {
+					pagHtml = 'Mostrando '+filtrados.length+' registro(s)';
+				}
+				$('#paginadorRegistros').html(pagHtml);
+			}
+
 			function cargarRegistros(){
 				$.get('registro_produccion.php?ajax=listar', function(data){
-					let html = '';
-					data.forEach(function(r){
-						html += '<tr>' +
-							'<td>' + r.code + '</td>' +
-							'<td>' + r.name + '</td>' +
-							'<td>' + r.fecha + '</td>' +
-							'<td>' + r.presentacion + '</td>' +
-							'<td>' + r.cantidad + '</td>' +
-							'<td>' + r.lote + '</td>' +
-							'<td>' + r.vencimiento + '</td>' +
-							'<td>' + r.responsable + '</td>' +
-							'<td>' + (r.observaciones || '') + '</td>' +
-							'<td><button class="btn btn-danger btnEliminar" data-id="' + r.id + '">Eliminar</button></td>' +
-						'</tr>';
-					});
-								// Eliminar registro (borrado lógico)
-								$(document).on('click', '.btnEliminar', function(){
-									const id = $(this).data('id');
-									if (!confirm('¿Seguro que deseas solicitar la eliminación de este registro?')) return;
-									let justificacion = prompt('Por favor, ingresa la justificación para la eliminación:');
-									if (!justificacion || justificacion.trim().length < 5) {
-										alert('Debes ingresar una justificación válida.');
-										return;
-									}
-									// Paso 1: Solicitar código
-									$.ajax({
-										url: 'registro_produccion.php?ajax=eliminar',
-										method: 'POST',
-										contentType: 'application/json',
-										data: JSON.stringify({id: id, justificacion: justificacion}),
-										success: function(resp){
-											if(resp.success){
-												let codigo = prompt('Se envió un código de confirmación al correo autorizado. Ingresa el código para completar la eliminación:');
-												if (!codigo || codigo.trim().length < 3) {
-													alert('Debes ingresar el código recibido por correo.');
-													return;
-												}
-												// Paso 2: Confirmar código
-												$.ajax({
-													url: 'registro_produccion.php?ajax=eliminar',
-													method: 'POST',
-													contentType: 'application/json',
-													data: JSON.stringify({id: id, codigo: codigo}),
-													success: function(resp2){
-														if(resp2.success){
-															alert('Registro eliminado correctamente');
-															cargarRegistros();
-														}else{
-															alert(resp2.message||'Error al eliminar');
-														}
-													},
-													error: function(xhr, status, error){
-														alert('Error AJAX al eliminar: '+error);
-														console.error('AJAX eliminar error:', status, error, xhr.responseText);
-													}
-												});
-											}else{
-												alert(resp.message||'Error al solicitar eliminación');
-											}
-										},
-										error: function(xhr, status, error){
-											alert('Error AJAX al eliminar: '+error);
-											console.error('AJAX eliminar error:', status, error, xhr.responseText);
-										}
-									});
-								});
-					$('#tablaRegistros').html(html);
+					registrosData = data;
+					paginaActual = 1;
+					renderTablaRegistros();
 				});
 			}
 			cargarRegistros();
+
+			// Búsqueda en tiempo real
+			$(document).on('input', '#buscadorRegistros', function(){
+				filtroBusqueda = $(this).val();
+				paginaActual = 1;
+				renderTablaRegistros();
+			});
+			// Paginador
+			$(document).on('click', '#pagAnt', function(){
+				if (paginaActual > 1) { paginaActual--; renderTablaRegistros(); }
+			});
+			$(document).on('click', '#pagSig', function(){
+				let filtrados = registrosData.filter(function(r) {
+					if (!filtroBusqueda) return true;
+					let texto = (
+						(r.code||'') + ' ' +
+						(r.name||'') + ' ' +
+						(r.lote||'') + ' ' +
+						(r.responsable||'') + ' ' +
+						(r.observaciones||'')
+					).toLowerCase();
+					return texto.includes(filtroBusqueda.toLowerCase());
+				});
+				let totalPaginas = Math.ceil(filtrados.length / registrosPorPagina) || 1;
+				if (paginaActual < totalPaginas) { paginaActual++; renderTablaRegistros(); }
+			});
 
 			// Modal abrir/cerrar
 			$('#btnNuevoRegistro').on('click', function(){

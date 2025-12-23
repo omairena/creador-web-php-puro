@@ -19,32 +19,43 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Bienvenido - App</title>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    html, body.layout {
+      height: 100%;
+      min-height: 100vh;
+    }
+    body.layout {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+      height: 100vh;
+    }
+    .main {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      height: 100vh;
+      flex: 1;
+      margin-left: 260px;
+      padding-bottom: 0;
+    }
+    .content {
+      flex: 1 1 auto;
+    }
+    footer {
+      margin-top: auto;
+      width: 100%;
+      text-align: center;
+      padding: 10px 0;
+      background: #f2f2f2;
+    }
+    @media (max-width: 1000px) {
+      .main { margin-left: 0; }
+    }
+  </style>
 </head>
 <body class="layout">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <h2>Mi App</h2>
-    </div>
-    <nav class="menu">
-      <a href="welcome.php" class="<?= ($current === 'welcome.php') ? 'active' : '' ?>">Inicio</a>
-      <div class="menu-item <?= in_array($current, ['registro_produccion.php']) ? 'open' : '' ?>">
-        <a href="#" class="menu-parent">Registros</a>
-        <div class="submenu">
-          <a href="registro_produccion.php" class="<?= ($current === 'registro_produccion.php') ? 'active' : '' ?>">Registro Producción</a>
-        </div>
-      </div>
-      <a href="users.php" class="<?= ($current === 'users.php') ? 'active' : '' ?>">Usuario</a>
-
-      <div class="menu-item <?= in_array($current, ['products.php', 'presentations.php']) ? 'open' : '' ?>">
-        <a href="#" class="menu-parent">Producto</a>
-        <div class="submenu">
-          <a href="products.php" class="<?= ($current === 'products.php') ? 'active' : '' ?>">Producto</a>
-          <a href="presentations.php" class="<?= ($current === 'presentations.php') ? 'active' : '' ?>">Presentación</a>
-        </div>
-      </div>
-
-      <a href="?action=logout">Cerrar sesión</a>
-    </nav>
+    <?php include 'sidebar.php'; ?>
   </aside>
 
   <div class="main">
@@ -53,7 +64,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
       <button id="collapseBtn" class="collapse-btn" aria-label="Ocultar menú">◀</button>
       <h1>Bienvenido, <?=htmlspecialchars($_SESSION['user_name'])?></h1>
     </header>
-
+    <div style="text-align:center;margin-bottom:20px;">
+      <?php include 'logo_fragment.php'; ?>
+    </div>
     <section class="content">
       <div class="card">
         <h2>Panel de inicio</h2>
@@ -61,8 +74,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'logout') {
         <p>Diseñada para verse bien en tablets de 10&quot; (pantallas intermedias).</p>
       </div>
     </section>
+    <?php include 'footer.php'; ?>
   </div>
-
-<script src="assets/js/app.js"></script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>

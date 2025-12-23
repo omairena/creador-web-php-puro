@@ -1,3 +1,9 @@
+// Manejo centralizado de logout para todas las páginas
+if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+    logout();
+    header('Location: index.php');
+    exit;
+}
 <?php
 // auth.php - funciones de autenticación (usa $mysqli de db.php)
 require_once __DIR__ . '/db.php';

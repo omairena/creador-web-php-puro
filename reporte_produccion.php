@@ -146,6 +146,8 @@ if (isset($_GET['pdf'])) {
   <?php include 'sidebar.php'; ?>
   <div class="main" style="display:flex;flex-direction:column;min-height:100vh;">
     <header class="header">
+      <button id="toggleBtn" class="toggle-btn">☰</button>
+      <button id="collapseBtn" class="collapse-btn" aria-label="Ocultar menú">◀</button>
       <h1>Reporte de Producción</h1>
     </header>
     <section class="content" style="flex:1 1 auto;">
@@ -197,6 +199,7 @@ if (isset($_GET['pdf'])) {
       </table>
     </section>
     <?php include 'footer.php'; ?>
+    <script src="assets/js/app.js"></script>
   </div>
 </body>
 </html>
